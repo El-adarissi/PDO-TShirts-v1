@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # PDO-TShirts
 
 To run the front-end  app use npm run dev
@@ -9,3 +10,6 @@ to Acces to the route of Add Product use (http://localhost:5173/AdminGestion)
 And add  file 'vedio.mp4' into path 'frontendStore\src\assets\'
 
 Database : All Info about database check the file on path 'backendTshirts/.env' 
+=======
+# PDO-TShirts-v1
+>>>>>>> 4a19352ae556bbef1f94e3b385a6b08c3aa5e22e
