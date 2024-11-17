@@ -61,12 +61,50 @@ router.get("/users/:id", async (req, res) => {
 router.get("/products", async (req, res) => {
   try {
     const productList = await Product.findAll();
-    res.json(productList);
+    
+    res.status(200).json({
+      productList: productList.map((product) => {
+        return {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          richDescription: product.richDescription,
+          image: product.image, // Main image URL
+          images: JSON.parse(product.images), // Parse the images JSON array
+          price: product.price,
+          oldprice: product.oldprice,
+          rating: product.rating,
+          isFeatured: product.isFeatured,
+          dateCreated: product.dateCreated,
+          Category: product.Category,
+          colorOptions: JSON.parse(product.colorOptions),
+          sizeOptions: JSON.parse(product.sizeOptions),
+        };
+      }),
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+// router.get("/products", async (req, res) => {
+//   try {
+//     const productList = await Product.findAll();
+//     res.status(200).json({
+//       productList: productList.map((product) => {
+//         return {
+//           ...product,
+//           colorOptions: JSON.parse(product.colorOptions),
+//           sizeOptions: JSON.parse(product.sizeOptions),
+//         };
+//       }),
+//     });
+//   } catch (error) {
+//     console.error("Error fetching products:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
 
 // Get Product by id
 router.get("/products/:id", async (req, res) => {
@@ -88,116 +126,81 @@ router.get("/products/:id", async (req, res) => {
 
 // Add Product
 router.post(
-    "/products",
-    uploadOptions.array("images", 10),
-    async (req, res) => {
-      const files = req.files;
-      if (!files || files.length === 0) {
-        return res.status(400).json({ message: "No images in the request" });
-      }
-  
-      const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
-      const imageUrls = files.map((file) => `${basePath}${file.filename}`); // Keep as array, not JSON string.
-  
-      let colorOptions, sizeOptions;
-      try {
-        colorOptions = JSON.parse(req.body.colorOptions);
-        sizeOptions = JSON.parse(req.body.sizeOptions);
-      } catch (parseError) {
-        return res
-          .status(400)
-          .json({ message: "Invalid JSON format for colorOptions or sizeOptions" });
-      }
-  
-      try {
-        const newProduct = await Product.create({
-          name: req.body.name,
-          description: req.body.description,
-          richDescription: req.body.richDescription,
-          image: imageUrls[0], // Use the first image as the main image.
-          images: imageUrls, // Store the array directly in the `images` field.
-          oldprice: parseFloat(req.body.oldprice) || 0,
-          price: parseFloat(req.body.price) || 0,
-          rating: parseFloat(req.body.rating) || 0,
-          isFeatured: req.body.isFeatured === "true",
-          Category: req.body.Category,
-          colorOptions: colorOptions || {},
-          sizeOptions: sizeOptions || {},
-        });
-  
-        res.status(201).json({
-          message: "Product created successfully",
-          product: newProduct,
-        });
-      } catch (error) {
-        console.error("Error adding product:", error.message);
-        res.status(500).json({ message: "Internal server error" });
-      }
-    }
-  );
-  
-
-// Update Product by ID
-router.put(
-  "/products/update/:id",
-  uploadOptions.single("image"),
+  "/products",
+  uploadOptions.array("images", 10),
   async (req, res) => {
-    const { id } = req.params;
-    const file = req.file;
+    const files = req.files;
 
-    let imagePath;
-    if (file) {
-      const fileName = file.filename;
-      const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
-      imagePath = `${basePath}${fileName}`;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ message: "No images in the request" });
     }
+
+    const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
+    const imageUrls = files.map((file) => `${basePath}${file.filename}`);
+
+    let colorOptions = [];
+    let sizeOptions = [];
+    try {
+      if (req.body.colorOptions) {
+        colorOptions = JSON.parse(req.body.colorOptions);
+      }
+      if (req.body.sizeOptions) {
+        sizeOptions = JSON.parse(req.body.sizeOptions);
+      }
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ message: "Invalid JSON in colorOptions or sizeOptions" });
+    }
+    console.log(typeof sizeOptions);
+    console.log(typeof colorOptions);
+    console.log(typeof imageUrls);
+    console.log(sizeOptions);
+    console.log(colorOptions);
+    console.log(imageUrls);
 
     try {
-      const updatedProductData = {
+      const newProduct = await Product.create({
         name: req.body.name,
         description: req.body.description,
-        richDescription: req.body.richDescription,
-        oldprice: req.body.oldprice,
-        price: req.body.price,
-        rating: req.body.rating,
-        isFeatured: req.body.isFeatured,
-        Category: req.body.Category,
-      };
-
-      if (imagePath) {
-        updatedProductData.image = imagePath;
-      }
-
-      const updatedProduct = await Product.update(updatedProductData, {
-        where: { id },
+        richDescription: req.body.richDescription || "",
+        image: imageUrls[0], // First image as main
+        images: imageUrls,
+        oldprice: parseFloat(req.body.oldprice) || 0,
+        price: parseFloat(req.body.price) || 0,
+        rating: parseFloat(req.body.rating) || 0,
+        isFeatured: req.body.isFeatured === "true",
+        Category: req.body.Category || "ALL",
+        colorOptions,
+        sizeOptions,
       });
 
-      if (updatedProduct[0] === 0) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-      res.json({ message: "Product updated successfully" });
+      res.status(201).json({
+        message: "Product created successfully",
+        product: newProduct,
+      });
     } catch (error) {
-      console.error("Error updating product:", error);
+      console.error("Error adding product:", error.message);
       res.status(500).json({ message: "Internal server error" });
     }
   },
 );
+
 // Delete a product by ID
-router.delete('/products/:id', async (req, res) => {
-    const { id } = req.params;
-  
-    try {
-      const deletedProduct = await Product.destroy({ where: { id } });
-      if (deletedProduct) {
-        res.json({ message: "Product deleted successfully" });
-      } else {
-        res.status(404).json({ message: "Product not found" });
-      }
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      res.status(500).json({ message: "Internal server error" });
+router.delete("/products/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedProduct = await Product.destroy({ where: { id } });
+    if (deletedProduct) {
+      res.json({ message: "Product deleted successfully" });
+    } else {
+      res.status(404).json({ message: "Product not found" });
     }
-  });
-  
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 module.exports = router;

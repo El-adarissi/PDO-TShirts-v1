@@ -20,8 +20,6 @@ const Products = () => {
   }, []);
 
   const deleteProduct = async (id) => {
-    console.log("Deleting product with ID:", id); // Debug log
-
     try {
       const response = await axios.delete(
         `http://localhost:3000/api/v1/products/${id}`
@@ -39,7 +37,7 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get("http://localhost:3000/api/v1/products");
-      setProductData(response.data);
+      setProductData(response.data.productList);
     } catch (error) {
       console.error("Error fetching product data:", error);
     }
@@ -65,23 +63,10 @@ const Products = () => {
   ];
 
   const TABLE_ROWS = productData.map((product) => {
-    // Parse colorOptions and sizeOptions safely
-    const colorArray = (() => {
-      try {
-        return JSON.parse(product.colorOptions); // Parse colorOptions as JSON
-      } catch {
-        return []; // Default to empty array if parsing fails
-      }
-    })();
-
-    const sizeArray = (() => {
-      try {
-        return JSON.parse(product.sizeOptions); // Parse sizeOptions as JSON
-      } catch {
-        return []; // Default to empty array if parsing fails
-      }
-    })();
-
+    const colorString = product.colorOptions && Array.isArray(product.colorOptions)
+      ? product.colorOptions.map((color) => color.value).join(", ") 
+      : "N/A";
+  
     return {
       id: product.id,
       name: product.name,
@@ -89,14 +74,13 @@ const Products = () => {
       price: product.price.toFixed(2),
       oldPrice: product.oldprice.toFixed(2),
       category: product.Category,
-      color: Array.isArray(colorArray)
-        ? colorArray.map((color) => color.value).join(", ")
-        : "N/A", // Map and join color values if it's an array
-      size: Array.isArray(sizeArray) ? sizeArray.join(", ") : "N/A", // Join sizes into a string if it's an array
+      color: colorString, 
+      size: product.sizeOptions ? product.sizeOptions.join(", ") : "N/A", 
       image: product.image,
     };
   });
-
+  
+  
   return (
     <Card className="h-full w-full">
       <CardHeader floated={false} shadow={false} className="rounded-none">

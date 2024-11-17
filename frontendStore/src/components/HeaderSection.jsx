@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import BackgroundVideo from '../assets/BackroundVideo.mp4';
+// import BackgroundVideo from '../assets/BackroundVideo.mp4';
 
 const HeaderSection = () => {
     const sectionRef = useRef(null); 
@@ -15,7 +15,7 @@ const HeaderSection = () => {
             <div className="relative h-screen">
                 <video
                     className="absolute inset-0 w-full h-full object-cover"
-                    src={BackgroundVideo}
+                    // src={BackgroundVideo}
                     autoPlay
                     loop
                     muted

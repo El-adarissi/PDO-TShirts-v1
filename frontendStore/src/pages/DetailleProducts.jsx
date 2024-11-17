@@ -48,12 +48,9 @@ const DetailleProducts = () => {
   const { id } = useParams();
   const { cartProducts, setCartProducts } = useCart();
 
-  // if (!cartProducts) {
-  //   console.error("Cart context is undefined.");
-  //   return null;
-  // }
-  console.log(product.sizeOptions)
-  console.log(typeof product.sizeOptions)
+
+  // console.log(product.sizeOptions)
+  // console.log(typeof product.sizeOptions)
 
   const handleAddToCart = () => {
     if (quantity <= 0) {
@@ -86,21 +83,22 @@ const DetailleProducts = () => {
 
   
 
-  const imageUrls = product.images;
-  console.log(imageUrls);
-  // Function to handle the next image
+
+  console.log(product);
+
   const handleNext = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
+      prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
   // Function to handle the previous image
   const handlePrev = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
+      prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
     );
   };
+  
   const handleSizeToggle = (size) => {
     setSelectedSize((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
@@ -112,15 +110,15 @@ const DetailleProducts = () => {
       <div className="flex mt-40 pt-9 bg-white flex-col md:flex-row p-4">
         <Box className="w-full md:w-1/2 flex justify-center items-center p-4">
           <div className="relative w-full h-[500px] max-w-[600px] overflow-hidden rounded-lg shadow flex justify-center items-center">
-            {imageUrls.length > 0 ? (
+          {product.images.length > 0 ? (
               <>
                 {/* Image display */}
                 <img
-                  src={imageUrls[currentIndex]}
+                  src={product.images[currentIndex]}
                   alt={`Product ${currentIndex + 1}`}
                   className="w-full h-full object-cover transition-opacity duration-300 ease-in-out"
                 />
-                {imageUrls.length === 1 ? (
+                {product.images.length === 1 ? (
                   <p>Images are available</p>
                 ) : (
                   <>
@@ -173,7 +171,7 @@ const DetailleProducts = () => {
             <Typography variant="h8" className="font-bold text-black ">
               Size
             </Typography>
-            <Box className="size-selector">
+             <Box className="size-selector">
               <div className="size-options">
                 {product.sizeOptions.map((size) => (
                   <button
@@ -187,14 +185,14 @@ const DetailleProducts = () => {
                   </button>
                 ))}
               </div>
-            </Box>
+            </Box> 
 
             {/* Color Selection */}
             <Typography variant="h8" className="font-bold text-black ">
               {" "}
               Color
             </Typography>
-            <Box className="flex items-center space-x-2">
+             <Box className="flex items-center space-x-2">
               {product.colorOptions.map(({ value, color }) => (
                 <IconButton
                   key={value}
@@ -224,7 +222,7 @@ const DetailleProducts = () => {
                   )}
                 </IconButton>
               ))}
-            </Box>
+            </Box> 
 
             {/* Quantity Selection with Plus/Minus Icons */}
             <Typography variant="h8" className="font-bold text-black ">

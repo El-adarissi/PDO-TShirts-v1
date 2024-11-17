@@ -26,9 +26,9 @@ const Product = sequelize.define(
       defaultValue: "",
     },
     images: {
-      type: DataTypes.JSON, 
+      type: DataTypes.JSON,
       allowNull: false,
-      defaultValue: [],
+      defaultValue: [], // Default to an empty array
     },
     price: {
       type: DataTypes.FLOAT,
@@ -58,24 +58,18 @@ const Product = sequelize.define(
     colorOptions: {
       type: DataTypes.JSON,
       allowNull: false,
-      defaultValue: [],
+      defaultValue: [], // Default to an empty array
     },
     sizeOptions: {
       type: DataTypes.JSON,
       allowNull: false,
-      defaultValue: [],
+      defaultValue: [], // Default to an empty array
     },
   },
   {
     tableName: "Products",
     timestamps: false,
-    toJSON: {
-      virtuals: true,
-    },
-  },
-  {
-    timestamps: false,
-  },
+  }
 );
 
 module.exports = Product;

@@ -30,15 +30,24 @@ const Main = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [products, setProducts] = useState([]);
 
+
   useEffect(() => {
     axios
       .get("http://localhost:3000/api/v1/products")
-      .then((response) => setProducts(response.data))
+      .then((response) => {
+        // Assuming response.data contains the object with productList
+        const products = response.data.productList;
+        setProducts(products); // Now, you are passing the correct array to state
+      })
       .catch((error) =>
         console.error("There was an error fetching the products!", error)
       );
   }, []);
+  
 
+
+ 
+  
   const handleAddToCart = (product) => {
     setCartProducts((prevCart) => {
       const isProductInCart = prevCart.some(
@@ -160,7 +169,7 @@ const Main = () => {
             >
               <Link
                 state={{ product: item }}
-                to={`/product/${item.name}`} // Updated the link to use `item.name`
+                to={`/product/${item.name}`} 
                 className="product-card-link"
               >
                 <CardMedia sx={{ height: 277 }} image={item.image} />

@@ -116,7 +116,7 @@ const Checkout = () => {
                     <span>{product.price * product.quantity } MAD</span>
                   </div>
                   <div className="text-sm text-gray-500 ml-2">
-                    المقاس: {product.size} &nbsp; اللون: {product.color}
+                    المقاس: {product.size.join(',')} &nbsp; اللون: {product.color.join(',')}
                   </div>
                 </div>
               ))}
