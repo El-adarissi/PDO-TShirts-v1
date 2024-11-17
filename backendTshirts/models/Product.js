@@ -57,11 +57,13 @@ const Product = sequelize.define(
     },
     colorOptions: {
       type: DataTypes.JSON,
-      defaultValue: JSON.stringify({}),
+      allowNull: false,
+      defaultValue: [],
     },
     sizeOptions: {
       type: DataTypes.JSON,
-      defaultValue: JSON.stringify({}),
+      allowNull: false,
+      defaultValue: [],
     },
   },
   {

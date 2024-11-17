@@ -86,7 +86,8 @@ const DetailleProducts = () => {
 
   
 
-  const imageUrls = JSON.parse(product.images);
+  const imageUrls = product.images;
+  console.log(imageUrls);
   // Function to handle the next image
   const handleNext = () => {
     setCurrentIndex((prevIndex) =>
@@ -174,7 +175,7 @@ const DetailleProducts = () => {
             </Typography>
             <Box className="size-selector">
               <div className="size-options">
-                {JSON.parse(product.sizeOptions).map((size) => (
+                {product.sizeOptions.map((size) => (
                   <button
                     key={size}
                     className={`size-button ${
@@ -194,7 +195,7 @@ const DetailleProducts = () => {
               Color
             </Typography>
             <Box className="flex items-center space-x-2">
-              {JSON.parse(product.colorOptions).map(({ value, color }) => (
+              {product.colorOptions.map(({ value, color }) => (
                 <IconButton
                   key={value}
                   onClick={() => handleColorToggle(value)}
