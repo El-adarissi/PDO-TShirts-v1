@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 import { ShoppingCartOutlined } from "@mui/icons-material";
 import { useState } from "react";
@@ -50,7 +51,6 @@ const Navbar = () => {
     setMobileDrawerOpen(false);
     setSubmenuOpen({});
   };
-  // eslint-disable-next-line no-unused-vars
   const handleCartClose = () => {
     setOpenCart(false);
   };

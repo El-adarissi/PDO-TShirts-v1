@@ -1,90 +1,30 @@
 /* eslint-disable no-unused-vars */
 import "./SizeSelector.css";
 import MainLayout from "../layout/MainLayout";
-import { useParams } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
-import {
-  Box,
-  Typography,
-  Rating,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-} from "@mui/material";
+import { Box, Typography, Rating, IconButton } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { useLocation } from "react-router-dom";
 
 const DetailleProducts = () => {
   const location = useLocation();
-  const { product } = location.state;
-
+  const { product, selectedSizes } = location.state || {};
   const [quantity, setQuantity] = useState(0);
   const [selectedColors, setSelectedColors] = useState([]);
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedSize, setSelectedSize] = useState(["S"]);
-
-  const handleColorToggle = (color) => {
-    setSelectedColors((prev) =>
-      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color]
-    );
-  };
-
-  const handleIncrease = () => {
-    setQuantity((prev) => (prev < 20 ? prev + 1 : prev));
-  };
-
-  const handleDecrease = () => {
-    setQuantity((prev) => (prev > 0 ? prev - 1 : prev));
-  };
-
-  const { id } = useParams();
+  const [selectedSize, setSelectedSize] = useState([]);
   const { cartProducts, setCartProducts } = useCart();
-
-
-  // console.log(product.sizeOptions)
-  // console.log(typeof product.sizeOptions)
-
-  const handleAddToCart = () => {
-    if (quantity <= 0) {
-      setShowDialog(true);
-      return;
-    }
-
-    setCartProducts((prevCart) => {
-      const productIndex = prevCart.findIndex((item) => item.id === product.id);
-
-      if (productIndex >= 0) {
-        const updatedCart = [...prevCart];
-        updatedCart[productIndex] = {
-          ...updatedCart[productIndex],
-          size: selectedSize,
-          quantity: updatedCart[productIndex].quantity + quantity,
-          color: selectedColors,
-        };
-        return updatedCart;
-      } else {
-        return [
-          ...prevCart,
-          { ...product, size: selectedSize, quantity, color: selectedColors },
-        ];
-      }
-    });
-  };
-
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  
-
-
-  console.log(product);
+  // Function to handle the previous and Next image
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
+    );
+  };
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) =>
@@ -92,25 +32,105 @@ const DetailleProducts = () => {
     );
   };
 
-  // Function to handle the previous image
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
-    );
-  };
-  
-  const handleSizeToggle = (size) => {
-    setSelectedSize((prev) =>
-      prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
-    );
+  const handleColorToggle = (color) => {
+    setSelectedColors((prev) => {
+      // If the color is already selected, deselect it; otherwise, select it
+      const newColors = prev.includes(color)
+        ? prev.filter((c) => c !== color)
+        : [...prev, color];
+
+      setCartProducts((prevCart) => {
+        if (!Array.isArray(prevCart)) return [];
+
+        return prevCart.map((item) =>
+          item.id === product.id
+            ? { ...item, color: newColors } // Dynamically update color
+            : item
+        );
+      });
+
+      return newColors;
+    });
   };
 
+  const handleSizeToggle = (size) => {
+    setSelectedSize((prev) => {
+      // If the size is already selected, deselect it; otherwise, select it
+      const newSize = prev.includes(size)
+        ? prev.filter((s) => s !== size)
+        : [...prev, size];
+
+      setCartProducts((prevCart) => {
+        if (!Array.isArray(prevCart)) return [];
+
+        return prevCart.map((item) =>
+          item.id === product.id
+            ? { ...item, size: newSize } // Dynamically update size
+            : item
+        );
+      });
+
+      return newSize;
+    });
+  };
+
+  const handleIncrease = () => {
+    setQuantity((prev) => {
+      const newQuantity = prev + 1;
+
+      setCartProducts((prevCart) => {
+        if (!Array.isArray(prevCart)) return [];
+        const updatedCart = prevCart.filter((item) => item.id !== product.id);
+        // Add the updated product with the new size, color, and quantity
+        return [
+          ...updatedCart,
+          {
+            ...product,
+            quantity: newQuantity,
+            size: selectedSize,
+            color: selectedColors,
+          },
+        ];
+      });
+
+      return newQuantity;
+    });
+  };
+
+  const handleDecrease = () => {
+    setQuantity((prev) => {
+      const newQuantity = prev > 0 ? prev - 1 : 0;
+
+      setCartProducts((prevCart) => {
+        if (!Array.isArray(prevCart)) return [];
+
+        const updatedCart = prevCart.filter((item) => item.id !== product.id);
+
+        if (newQuantity > 0) {
+          // Add the updated product with the reduced quantity
+          return [
+            ...updatedCart,
+            {
+              ...product,
+              quantity: newQuantity,
+              size: selectedSize,
+              color: selectedColors,
+            },
+          ];
+        }
+
+        return updatedCart;
+      });
+
+      return newQuantity;
+    });
+  };
   return (
     <MainLayout>
       <div className="flex mt-40 pt-9 bg-white flex-col md:flex-row p-4">
         <Box className="w-full md:w-1/2 flex justify-center items-center p-4">
           <div className="relative w-full h-[500px] max-w-[600px] overflow-hidden rounded-lg shadow flex justify-center items-center">
-          {product.images.length > 0 ? (
+            {product.images.length > 0 ? (
               <>
                 {/* Image display */}
                 <img
@@ -171,44 +191,48 @@ const DetailleProducts = () => {
             <Typography variant="h8" className="font-bold text-black ">
               Size
             </Typography>
-             <Box className="size-selector">
+            <Box className="size-selector">
               <div className="size-options">
                 {product.sizeOptions.map((size) => (
                   <button
                     key={size}
-                    className={`size-button ${
+                    className={`size-button text-black ${
                       selectedSize.includes(size) ? "selected" : ""
                     }`}
-                    onClick={() => handleSizeToggle(size)} 
+                    onClick={() => handleSizeToggle(size)}
                   >
                     {size}
                   </button>
                 ))}
               </div>
-            </Box> 
+            </Box>
 
             {/* Color Selection */}
             <Typography variant="h8" className="font-bold text-black ">
               {" "}
               Color
             </Typography>
-             <Box className="flex items-center space-x-2">
+            <Box className="flex items-center space-x-2">
               {product.colorOptions.map(({ value, color }) => (
                 <IconButton
                   key={value}
+                 
                   onClick={() => handleColorToggle(value)}
                   style={{
                     backgroundColor: selectedColors.includes(value)
                       ? color
                       : "transparent",
-                    border: `2px solid ${color}`,
+                    border: `3px solid ${color}`,
                     borderRadius: "30%", // Circular buttons
                     position: "relative",
                     width: 40,
                     height: 40,
                   }}
                   aria-label={value}
+                  
+                  
                 >
+                  <span className="text-black text-sm">{value[0]}</span>
                   {selectedColors.includes(value) && (
                     <CheckIcon
                       style={{
@@ -222,7 +246,8 @@ const DetailleProducts = () => {
                   )}
                 </IconButton>
               ))}
-            </Box> 
+              
+            </Box>
 
             {/* Quantity Selection with Plus/Minus Icons */}
             <Typography variant="h8" className="font-bold text-black ">
@@ -257,16 +282,6 @@ const DetailleProducts = () => {
               </IconButton>
             </Box>
           </Box>
-          {quantity > 0 && (
-            <Link to="/checkout">
-              <button
-                onClick={handleAddToCart}
-                className="btn checkout-btn hover:bg-red-700"
-              >
-                Add to Cart
-              </button>
-            </Link>
-          )}
         </Box>
       </div>
     </MainLayout>

@@ -45,9 +45,6 @@ const Main = () => {
   }, []);
   
 
-
- 
-  
   const handleAddToCart = (product) => {
     setCartProducts((prevCart) => {
       const isProductInCart = prevCart.some(
@@ -158,7 +155,7 @@ const Main = () => {
               transition={{ duration: 1.6, type: "spring", stiffness: 50 }}
               key={item.id}
               sx={{
-                maxWidth: 300,
+                maxWidth: 320,
                 mt: 6,
                 ":hover .MuiCardMedia-root ": {
                   rotate: "1deg",
@@ -172,7 +169,7 @@ const Main = () => {
                 to={`/product/${item.name}`} 
                 className="product-card-link"
               >
-                <CardMedia sx={{ height: 277 }} image={item.image} />
+                <CardMedia sx={{ height: 277 , width:300 }} image={item.image} />
               </Link>
               <CardContent>
                 <Stack
@@ -183,27 +180,27 @@ const Main = () => {
                   <Typography gutterBottom variant="h6" component="div">
                     {item.name}
                   </Typography>
-                  <Typography variant="subtitle1" component="p">
+                  <Typography variant="subtitle1" className="text-green-500" component="p">
                     {item.price} MAD
                   </Typography>
                 </Stack>
                 <Typography variant="body2" color="text.primary">
                   {item.description || "Product description goes here"}
-                  <Typography variant="subtitle1" sx={{ color: "#4a4a4a",textDecoration: 'line-through' }} component="p">
-                  {item.oldprice} MAD
-                  </Typography>
                 </Typography>
                 
               </CardContent>
               <CardActions sx={{ justifyContent: "space-between" }}>
-                <Button
+                {/* <Button
                   onClick={() => handleAddToCart(item)}
                   sx={{ textTransform: "capitalize" }}
                   size="small"
                 >
                   <AddShoppingCartOutlined sx={{ mr: 1 }} fontSize="small" />
                   Add to cart
-                </Button>
+                </Button> */}
+                <Typography variant="subtitle1" sx={{ color: "red",textDecoration: 'line-through' }} component="p">
+                  {item.oldprice} MAD
+                  </Typography>
                 <Rating
                   precision={0.1}
                   name="read-only"

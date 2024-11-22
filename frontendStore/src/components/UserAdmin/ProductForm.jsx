@@ -58,6 +58,15 @@ function ProductForm({ product = null }) {
     ],
   };
 
+  const predefinedColors = [
+    { value: "Red", color: "#FF0000" },
+    { value: "Blue", color: "#0000FF" },
+    { value: "Green", color: "#008000" },
+    { value: "Yellow", color: "#FFFF00" },
+    { value: "Black", color: "#000000" },
+    { value: "White", color: "#F1F3F6" },
+  ];
+
   // Update size options based on selected category
   useEffect(() => {
     setsizeOptions(sizeOptionsMap[category] || []);
@@ -277,45 +286,55 @@ function ProductForm({ product = null }) {
       </div>
       <div className="mb-4">
         <h4>Color Options</h4>
-        {colorOptions.map((option, index) => (
-          <div key={index} className="flex items-center gap-2 mb-2">
-            <input
-              type="text"
-              placeholder="Color Name"
-              value={option.value}
-              onChange={(e) =>
-                setcolorOptions(
-                  colorOptions.map((opt, i) =>
-                    i === index ? { ...opt, value: e.target.value } : opt
-                  )
-                )
-              }
-              className="p-2 border border-gray-300 rounded"
-            />
-            <input
-              type="color"
-              value={option.color}
-              onChange={(e) =>
-                setcolorOptions(
-                  colorOptions.map((opt, i) =>
-                    i === index ? { ...opt, color: e.target.value } : opt
-                  )
-                )
-              }
-              className="p-2 border border-gray-300 rounded"
-            />
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() =>
-            setcolorOptions([...colorOptions, { value: "", color: "" }])
-          }
-          className="text-blue-500"
+
+        {/* Dropdown to select predefined colors */}
+        <select
+          onChange={(e) => {
+            const selectedColor = predefinedColors.find(
+              (color) => color.value === e.target.value
+            );
+            if (
+              selectedColor &&
+              !colorOptions.some(
+                (option) => option.value === selectedColor.value
+              )
+            ) {
+              setcolorOptions([...colorOptions, selectedColor]);
+            }
+          }}
+          className="w-full p-2 mb-4 border border-gray-300 rounded"
         >
-          Add Color Option
-        </button>
+          <option value="">Select a color</option>
+          {predefinedColors.map((color, index) => (
+            <option key={index} value={color.value}>
+              {color.value}
+            </option>
+          ))}
+        </select>
+
+        {/* Display selected colors */}
+        <div className="flex flex-wrap gap-4">
+          {colorOptions.map((option, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-2 border p-2 rounded shadow-sm"
+              style={{ backgroundColor: option.value, color: "#fff" }}
+            >
+              <span>{option.value}</span>
+              <button
+                type="button"
+                onClick={() =>
+                  setcolorOptions(colorOptions.filter((_, i) => i !== index))
+                }
+                className="text-red-500 font-bold"
+              >
+                X
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
+
       {/* Modal for missing fields */}
       {showDialog && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
